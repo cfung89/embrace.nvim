@@ -71,6 +71,10 @@ SB<char>    Surround selected text block with provided input character.
 SBS         Surround selected text block with provided input string.
 ```
 
+## TODO
+
+- [ ] Add custom surrounds.
+
 ## Inspirations
 
 - [vim-surround](https://github.com/tpope/vim-surround)

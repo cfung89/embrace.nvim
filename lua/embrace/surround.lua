@@ -132,8 +132,7 @@ M.surround = function(char)
 		["S"] = function()
 			local input = vim.fn.input("Enter input: ")
 			if string.sub(input, 1, 1) == "<" and string.sub(input, -1) == ">" then
-				utils.insert(string.sub(input, 1, 1) .. "/" .. string.sub(input, 2), row1 - 1, col1)
-				utils.insert(input, row0 - 1, col0 - 1)
+				insert_surround(input, string.sub(input, 1, 1) .. "/" .. string.sub(input, 2), range)
 			else
 				insert_surround(input, input, range)
 			end
