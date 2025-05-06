@@ -23,7 +23,10 @@ embrace.nvim allows for quick addition of surrounding characters such as quotes,
 
 ```lua
 {
-  "cfung89/embrace.nvim"
+  "cfung89/embrace.nvim",
+  config = function()
+    require("embrace").setup()  -- For default options
+  end
 }
 ```
 

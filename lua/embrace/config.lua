@@ -15,7 +15,7 @@ M.defaults = {
 ---@return nil
 M.set = function(opts)
 	opts = opts or {}
-	M.opts = vim.tbl_deep_extend("force", M.defaults, opts or {})
+	M.opts = vim.tbl_deep_extend("force", M.defaults, opts)
 
 	opts.surround_map = opts.surround_map or {}
 	for i, key in ipairs(opts.surround_map) do
