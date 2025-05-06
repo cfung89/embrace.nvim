@@ -8,8 +8,8 @@ local M = {}
 ---@param range table
 local insert_surround = function(opening, closing, range)
 	utils.validate_range(range)
-	local row0, col0 = unpack(range[1])
-	local row1, col1 = unpack(range[2])
+	local row0, col0 = utils.unpack(range[1])
+	local row1, col1 = utils.unpack(range[2])
 	utils.insert(closing, row1 - 1, col1)
 	utils.insert(opening, row0 - 1, col0 - 1)
 end
@@ -19,28 +19,28 @@ end
 ---@param range table
 local iter_surround_block = function(opening, closing, range)
 	utils.validate_range(range)
-	local row0, col0 = unpack(range[1])
-	local row1, col1 = unpack(range[2])
+	local row0, col0 = utils.unpack(range[1])
+	local row1, col1 = utils.unpack(range[2])
+	local abs_starting = utils.get_abs_pos(vim.api.nvim_buf_get_lines(0, row0 - 1, row0, false)[1] or "", col0)
+	local abs_ending = utils.get_abs_pos(vim.api.nvim_buf_get_lines(0, row1 - 1, row1, false)[1] or "", col1)
 	for i = row0, row1 do
-		insert_surround(opening, closing, { { i, col0 }, { i, col1 } })
+		local line = vim.api.nvim_buf_get_lines(0, i - 1, i, false)[1] or ""
+		local rel_starting = utils.get_relative_pos(line, abs_starting)
+		local rel_ending = utils.get_relative_pos(line, abs_ending)
+		insert_surround(opening, closing, { { i, rel_starting }, { i, rel_ending } })
 	end
 end
 
----Surround Visual Block mode selection with the given character or use additional functionality.
----@param char string
----@param range table
----@return function
-local surround_block = function(char, range)
-	utils.validate_range(range)
-	local row0, col0 = unpack(range[1])
-	local row1, col1 = unpack(range[2])
-	if row0 > row1 then
-		row0, row1 = row1, row0
+---Surround Visual Block mode range with the given character or use additional functionality.
+---@param char string | nil
+---@return nil
+local surround_block = function(char)
+	char = char or utils.get_input()
+	if char == "" then
+		return
 	end
-	if col0 > col1 then
-		col0, col1 = col1, col0
-	end
-	range = { { row0, col0 }, { row1, col1 } }
+
+	local range = utils.get_visual()
 	local surround_map = {
 		["("] = function()
 			iter_surround_block("( ", " )", range)
@@ -69,7 +69,11 @@ local surround_block = function(char, range)
 		[config.opts.keymaps.str] = function()
 			local input = vim.fn.input("Enter input: ")
 			if string.sub(input, 1, 1) == "<" and string.sub(input, -1) == ">" then
-				iter_surround_block(input, string.sub(input, 1, 1) .. "/" .. string.sub(input, 2), range)
+				if string.sub(input, 2, 2) == "/" then
+					iter_surround_block(string.sub(input, 1, 1) .. string.sub(input, 3), input, range)
+				else
+					iter_surround_block(input, string.sub(input, 1, 1) .. "/" .. string.sub(input, 2), range)
+				end
 			else
 				iter_surround_block(input, input, range)
 			end
@@ -78,27 +82,28 @@ local surround_block = function(char, range)
 			iter_surround_block(char, char, range)
 		end,
 	}
-	return utils.switch(char, surround_map, true)
+	utils.switch(char, surround_map, true)
 end
 
----Surround Visual mode selection with the given character or use additional functionality.
+---Surround Visual mode range with the given character or use additional functionality.
 ---@param char string | nil
+---@return nil
 M.surround = function(char)
 	char = char or utils.get_input()
 	if char == "" then
 		return
 	end
-	local selection = utils.get_visual()
-	utils.validate_range(selection)
+	local range = utils.get_visual()
+	utils.validate_range(range)
 
 	-- top left to bottom right
-	local row0, col0 = unpack(selection[1])
-	local row1, col1 = unpack(selection[2])
+	local row0, col0 = utils.unpack(range[1])
+	local row1, col1 = utils.unpack(range[2])
 	if row0 > row1 or (row0 == row1 and col0 > col1) then
 		row0, row1 = row1, row0
 		col0, col1 = col1, col0
 	end
-	local range = { { row0, col0 }, { row1, col1 } }
+	range = { { row0, col0 }, { row1, col1 } }
 	local surround_map = {
 		["("] = function()
 			insert_surround("( ", " )", range)
@@ -129,12 +134,16 @@ M.surround = function(char)
 			if newC == "" then
 				return
 			end
-			return surround_block(newC, selection)
+			surround_block(newC)
 		end,
 		[config.opts.keymaps.str] = function()
 			local input = vim.fn.input("Enter input: ")
 			if string.sub(input, 1, 1) == "<" and string.sub(input, -1) == ">" then
-				insert_surround(input, string.sub(input, 1, 1) .. "/" .. string.sub(input, 2), range)
+				if string.sub(input, 2, 2) == "/" then
+					iter_surround_block(string.sub(input, 1, 1) .. string.sub(input, 3), input, range)
+				else
+					insert_surround(input, string.sub(input, 1, 1) .. "/" .. string.sub(input, 2), range)
+				end
 			else
 				insert_surround(input, input, range)
 			end

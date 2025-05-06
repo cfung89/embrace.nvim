@@ -6,7 +6,6 @@ M.defaults = {
 		block = "B",
 		str = "S",
 	},
-	cmd = "Surround",
 }
 
 M.set = function(opts)

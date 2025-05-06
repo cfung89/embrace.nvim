@@ -1,5 +1,7 @@
 local M = {}
 
+M.unpack = unpack or table.unpack
+
 ---Switch function
 ---@param x string
 ---@param cases table
@@ -33,10 +35,7 @@ M.get_input = function()
 	if not success then
 		return ""
 	end
-	if type(c) ~= "number" then
-		vim.print("Invalid input character.")
-		return ""
-	end
+	assert(type(c) == "number", "Assertion Error: Invalid input character.")
 	return string.char(c)
 end
 
@@ -52,42 +51,50 @@ end
 
 ---Get absolute position, regardless of tabs.
 ---@param line string
----@param cursor integer
+---@param cursor integer 0-indexed cursor position (as given by Neovim)
 ---@return integer
 M.get_abs_pos = function(line, cursor)
 	local space_pos = 0
-	local end_pos = (cursor < #line) and cursor or #line
-	local tabwidth = vim.api.nvim_get_option_value("tabstop", { buf = 0 })
+	local end_pos = math.min(#line, cursor)
+	local tab_width = vim.api.nvim_get_option_value("tabstop", { buf = 0 })
 	for i = 1, end_pos do
 		local char = line:sub(i, i)
 		local length = 1
 		if char == "\t" then
-			length = tabwidth - (space_pos % tabwidth)
+			length = tab_width - (space_pos % tab_width)
 		end
 		space_pos = space_pos + length
 	end
 	return space_pos
 end
 
+---Get relative position, regardless of tabs.
+---@param line string
+---@param space_pos integer
+---@return integer
+M.get_relative_pos = function(line, space_pos)
+	local pos = 0
+	local tab_width = vim.api.nvim_get_option_value("tabstop", { buf = 0 })
+	for i = 1, #line do
+		local char = line:sub(i, i)
+		local length = 1
+		if char == "\t" then
+			length = tab_width - (pos % tab_width)
+		end
+		if pos + length > space_pos then
+			return i - 1
+		end
+		pos = pos + length
+	end
+	return #line
+end
+
 ---Gets coordinates of Visual mode selection
 ---@return table
 M.get_visual = function()
-	local _, row0, col0 = unpack(vim.fn.getpos("v"))
-	local _, row1, col1 = unpack(vim.fn.getpos("."))
-	M.get_visual_block()
+	local _, row0, col0 = M.unpack(vim.fn.getpos("v"))
+	local _, row1, col1 = M.unpack(vim.fn.getpos("."))
 	return { { row0, col0 }, { row1, col1 } }
-end
-
----Gets coordinates of Visual block mode selection
----@return table
-M.get_visual_block = function()
-	local _, row0, col0 = unpack(vim.fn.getpos("v"))
-	local _, row1, col1 = unpack(vim.fn.getpos("."))
-
-	local line = vim.api.nvim_get_current_line()
-	local starting = M.get_abs_pos(line, col0)
-	local ending = M.get_abs_pos(line, col1)
-	return { { row0, col0, starting }, { row1, col1, ending } }
 end
 
 return M
