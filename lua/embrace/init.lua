@@ -1,29 +1,17 @@
+local config = require("embrace.config")
+
 local M = {}
 
 M.setup = function(opts)
-	M.default_opts = {
-		keymap = "S",
-		cmd = "Surround",
-	}
-	M.config = vim.tbl_deep_extend("force", M.default_opts, opts or {})
+	config.set(opts)
 
-	vim.api.nvim_create_user_command(M.config.cmd, function()
-		local status, surround = pcall(require, "embrace.surround")
-		if not status then
-			print("Error: 'embrace.surround' module not found!")
-			return
-		end
-		surround.surround()
-	end, { desc = "Surround selected text by the given input" })
-
-	vim.keymap.set("v", M.config.keymap, function()
-		local status, surround = pcall(require, "embrace.surround")
-		if not status then
-			print("Error: 'embrace.surround' module not found!")
-			return
-		end
-		surround.surround()
-	end)
+	if config.opts.cmd then
+		vim.api.nvim_create_user_command(config.opts.cmd, require("embrace.surround").surround,
+			{ desc = "Surround selected text by the given input" })
+	end
+	if config.opts.keymaps.surround then
+		vim.keymap.set("v", config.opts.keymaps.surround, require("embrace.surround").surround)
+	end
 end
 
 return M

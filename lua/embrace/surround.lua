@@ -1,5 +1,7 @@
-local M = {}
 local utils = require("embrace.utils")
+local config = require("embrace.config")
+
+local M = {}
 
 ---@param opening string
 ---@param closing string
@@ -64,7 +66,7 @@ local surround_block = function(char, range)
 		[">"] = function()
 			iter_surround_block("<", ">", range)
 		end,
-		["S"] = function()
+		[config.opts.keymaps.str] = function()
 			local input = vim.fn.input("Enter input: ")
 			if string.sub(input, 1, 1) == "<" and string.sub(input, -1) == ">" then
 				iter_surround_block(input, string.sub(input, 1, 1) .. "/" .. string.sub(input, 2), range)
@@ -122,14 +124,14 @@ M.surround = function(char)
 		[">"] = function()
 			insert_surround("<", ">", range)
 		end,
-		["B"] = function()
+		[config.opts.keymaps.block] = function()
 			local newC = utils.get_input()
 			if newC == "" then
 				return
 			end
 			return surround_block(newC, selection)
 		end,
-		["S"] = function()
+		[config.opts.keymaps.str] = function()
 			local input = vim.fn.input("Enter input: ")
 			if string.sub(input, 1, 1) == "<" and string.sub(input, -1) == ">" then
 				insert_surround(input, string.sub(input, 1, 1) .. "/" .. string.sub(input, 2), range)
