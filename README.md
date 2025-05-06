@@ -1,6 +1,10 @@
 # embrace.nvim
 
-Embrace your text.
+> embrace.nvim:
+>
+>     Embrace your text.
+
+embrace.nvim allows for quick addition of surrounding characters such as quotes, brackets, tags, or any string around selected text.
 
 ## Features
 
@@ -29,10 +33,24 @@ Embrace your text.
 require("embrace").setup({
   --- default configuration
   keymaps = {
-    surround = "S",     -- Surround
-    block = "B",        -- Surround in block mode
-    str = "S",          -- Input string when surrounding
+    surround = "S",             -- Surround
+    surround_block = "B"        -- Surround in block mode after the above keymap
+    block = "<leader>SB",       -- Surround in block mode directly
+    str = "S",                  -- Input string when surrounding
   }
+  
+  -- Custom added/modified surround input map
+  -- Must be of the form { { "<input_key>", "<opening_string>", "<closing_string" }, ... },
+  -- where when input_key is entered (for example with 'S<input_key>'), the selected text will
+  -- be surround with opening_string and closing string.
+  surround_map = {},
+
+  -- Custom added/modified surround block input map
+  -- If nil, surround_block_map is set to surround_map.
+  -- Must be of the form { { "<input_key>", "<opening_string>", "<closing_string" }, ... },
+  -- where when input_key is entered (for example with 'S<input_key>'), the selected text will
+  -- be surround with opening_string and closing string.
+  surround_block_map = nil,
 })
 ```
 
@@ -60,6 +78,7 @@ SS          Surround selected text with provided input string.
 
 Note: These keybindings also work in "normal" visual mode. They will surround each line within the visual selection with the specified characters.
 
+This is generally called using the `surround` keymap followed by `surround_block`
 ```
 SB(         Surround selected text block with `( ` and ` )`
 SB)         Surround selected text block with `(` and `)`
@@ -74,9 +93,12 @@ SB<char>    Surround selected text block with provided input character.
 SBS         Surround selected text block with provided input string.
 ```
 
+This can also be called directly as follows, using the `block` keymap (without the `surround` keymap).
+
 ## TODO
 
-- [ ] Add custom surrounds.
+- [X] Fix surround visual block on lines with different tabbing.
+- [X] Add custom surrounds.
 
 ## Inspirations
 

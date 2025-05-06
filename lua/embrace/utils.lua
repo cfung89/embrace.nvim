@@ -2,7 +2,7 @@ local M = {}
 
 M.unpack = unpack or table.unpack
 
----Switch function
+---Switch function.
 ---@param x string
 ---@param cases table
 ---@param run boolean
@@ -95,6 +95,36 @@ M.get_visual = function()
 	local _, row0, col0 = M.unpack(vim.fn.getpos("v"))
 	local _, row1, col1 = M.unpack(vim.fn.getpos("."))
 	return { { row0, col0 }, { row1, col1 } }
+end
+
+---@param opening string
+---@param closing string
+---@param range table
+---@return nil
+M.insert_surround = function(opening, closing, range)
+	M.validate_range(range)
+	local row0, col0 = M.unpack(range[1])
+	local row1, col1 = M.unpack(range[2])
+	M.insert(closing, row1 - 1, col1)
+	M.insert(opening, row0 - 1, col0 - 1)
+end
+
+---@param opening string
+---@param closing string
+---@param range table
+---@return nil
+M.insert_surround_block = function(opening, closing, range)
+	M.validate_range(range)
+	local row0, col0 = M.unpack(range[1])
+	local row1, col1 = M.unpack(range[2])
+	local abs_starting = M.get_abs_pos(vim.api.nvim_buf_get_lines(0, row0 - 1, row0, false)[1] or "", col0)
+	local abs_ending = M.get_abs_pos(vim.api.nvim_buf_get_lines(0, row1 - 1, row1, false)[1] or "", col1)
+	for i = row0, row1 do
+		local line = vim.api.nvim_buf_get_lines(0, i - 1, i, false)[1] or ""
+		local rel_starting = M.get_relative_pos(line, abs_starting)
+		local rel_ending = M.get_relative_pos(line, abs_ending)
+		M.insert_surround(opening, closing, { { i, rel_starting }, { i, rel_ending } })
+	end
 end
 
 return M
