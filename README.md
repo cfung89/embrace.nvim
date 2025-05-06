@@ -28,14 +28,17 @@ Embrace your text.
 ```lua
 require("embrace").setup({
   --- default configuration
-  keymap = "S",         -- keymap to surround text
-  cmd = "Surround",     -- user command
+  keymaps = {
+    surround = "S",     -- Surround
+    block = "B",        -- Surround in block mode
+    str = "S",          -- Input string when surrounding
+  }
 })
 ```
 
 ## Usage
 
-The following keybindings are provided.
+The following default keybindings are provided.
 
 ### Visual mode
 

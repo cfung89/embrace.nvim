@@ -6,6 +6,7 @@ local M = {}
 ---@param opening string
 ---@param closing string
 ---@param range table
+---@return nil
 local insert_surround = function(opening, closing, range)
 	utils.validate_range(range)
 	local row0, col0 = utils.unpack(range[1])
@@ -17,6 +18,7 @@ end
 ---@param opening string
 ---@param closing string
 ---@param range table
+---@return nil
 local iter_surround_block = function(opening, closing, range)
 	utils.validate_range(range)
 	local row0, col0 = utils.unpack(range[1])
