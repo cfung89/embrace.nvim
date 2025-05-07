@@ -2,6 +2,7 @@ local config = require("embrace.config")
 
 local M = {}
 
+---@param opts table | nil
 M.setup = function(opts)
 	config.set(opts)
 

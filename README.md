@@ -37,27 +37,29 @@ require("embrace").setup({
   --- default configuration
   keymaps = {
     surround = "S",             -- Surround
-    surround_block = "B"        -- Surround in block mode after the above keymap
-    block = "<leader>SB",       -- Surround in block mode directly
+    surround_block = "B",        -- Surround in block mode after the above keymap
     str = "S",                  -- Input string when surrounding
+    block = "<leader>SB",       -- Surround in block mode directly
   }
   
-  -- Custom added/modified surround input map
+  -- Custom added/modified surround input map.
   -- Must be of the form { { "<input_key>", "<opening_string>", "<closing_string" }, ... },
   -- where when input_key is entered (for example with 'S<input_key>'), the selected text will
   -- be surround with opening_string and closing string.
+  -- input_key is a single char; opening and closing strings can be of any length.
+  -- Example: surround_map = { { "A", "foo", "bar" } }
+  -- Typing 'SA' surround the selection as follows "foo{selection}bar".
   surround_map = {},
 
-  -- Custom added/modified surround block input map
+  -- Custom added/modified surround block input map.
   -- If nil, surround_block_map is set to surround_map.
-  -- Must be of the form { { "<input_key>", "<opening_string>", "<closing_string" }, ... },
-  -- where when input_key is entered (for example with 'S<input_key>'), the selected text will
-  -- be surround with opening_string and closing string.
+  -- Behaves the same as surround_map.
   surround_block_map = nil,
 })
 ```
 
 ## Usage
+
 
 The following default keybindings are provided.
 
