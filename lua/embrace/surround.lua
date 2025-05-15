@@ -4,7 +4,7 @@ local config = require("embrace.config")
 local M = {}
 
 ---Surround Visual Block mode range with the given character or use additional functionality.
----@param char string | nil
+---@param char string?
 ---@return nil
 M.surround_block = function(char)
 	char = char or utils.get_input()
@@ -64,7 +64,7 @@ M.surround_block = function(char)
 end
 
 ---Surround Visual mode range with the given character or use additional functionality.
----@param char string | nil
+---@param char string?
 ---@return nil
 M.surround = function(char)
 	char = char or utils.get_input()

@@ -11,7 +11,7 @@ M.defaults = {
 	surround_block_map = nil,
 }
 
----@param opts table | nil
+---@param opts table?
 ---@return nil
 M.set = function(opts)
 	opts = opts or {}
